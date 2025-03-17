@@ -53,6 +53,9 @@ make html
 
 The [make-api-clean-html.bat](./docs/make-api-clean-html.bat) can be run from the [`docs`](./docs) folder to this effect.
 
+## Missing References
+
+Missing references can be skipped by adding the full name to the `skip_missing_references` set in [`docs/conf.py`](./docs/conf.py).
 
 ## Documentation Settings
 
