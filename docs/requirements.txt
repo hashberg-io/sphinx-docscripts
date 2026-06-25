@@ -1,5 +1,6 @@
 sphinx_rtd_theme
 sphinx_autodoc_typehints
-
 typing_extensions
+
 # include all package dependencies here
+PROJECT_NAME

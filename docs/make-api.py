@@ -11,8 +11,6 @@ import pkgutil
 from typing import Dict, List, Optional, Tuple
 import sys
 
-from typing_validation import validate
-
 def _list_package_contents(pkg_name: str) -> List[str]:
     modules = [pkg_name]
     for submod in pkgutil.iter_modules([pkg_name.replace(".", "/")]):
@@ -63,29 +61,29 @@ Set "toc_filename" to null to avoid generating a table of contents file.
         with open("make-api.json", "r") as f:
             config = json.load(f)
             pkg_name = config.get("pkg_name", None)
-            validate(pkg_name, str)
+            # validate(pkg_name, str)
             pkg_path = config.get("pkg_path", None)
-            validate(pkg_path, str)
+            # validate(pkg_path, str)
             apidocs_folder = config.get("apidocs_folder", None)
-            validate(apidocs_folder, str)
+            # validate(apidocs_folder, str)
             toc_filename = config.get("toc_filename", None)
-            validate(toc_filename, str)
+            # validate(toc_filename, str)
             type_alias_dict_filename = config.get("type_alias_dict_filename", None)
-            validate(type_alias_dict_filename, Optional[str])
+            # validate(type_alias_dict_filename, Optional[str])
             include_members = config.get("include_members", {})
-            validate(include_members, Dict[str, List[str]])
+            # validate(include_members, Dict[str, List[str]])
             type_aliases = config.get("type_aliases", {})
-            validate(type_aliases, Dict[str, List[str]])
+            # validate(type_aliases, Dict[str, List[str]])
             exclude_members = config.get("exclude_members", {})
-            validate(exclude_members, Dict[str, List[str]])
+            # validate(exclude_members, Dict[str, List[str]])
             include_modules = config.get("include_modules", [])
-            validate(include_modules, List[str])
+            # validate(include_modules, List[str])
             exclude_modules = config.get("exclude_modules", [])
-            validate(exclude_modules, List[str])
+            # validate(exclude_modules, List[str])
             member_fullnames = config.get("member_fullnames", {})
-            validate(member_fullnames, Dict[str, Dict[str, str]])
+            # validate(member_fullnames, Dict[str, Dict[str, str]])
             special_class_members = config.get("special_class_members", {})
-            validate(special_class_members, Dict[str, List[str]])
+            # validate(special_class_members, Dict[str, List[str]])
     except FileNotFoundError:
         print(err_msg)
         sys.exit(1)

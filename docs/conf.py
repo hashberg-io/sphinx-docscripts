@@ -104,7 +104,14 @@ html_theme = 'sphinx_rtd_theme'
 # so a file named "default.css" will overwrite the builtin "default.css".
 # html_static_path = ['_static']
 
+# Set of problematic references to ignore, i.e. not warn about when missing.
 skip_missing_references: set[str] = set()
+
+# Set of descriptors to be documented as properties.
+property_descriptors: set[str] = set()
+
+# Set of descriptors to be documented as cached properties.
+cached_property_descriptors: set[str] = set()
 
 def on_missing_reference(app: Sphinx, env: BuildEnvironment, node: pending_xref, contnode: Any) -> Any:
     if node['reftarget'] in skip_missing_references:
