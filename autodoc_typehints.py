@@ -15,6 +15,7 @@
 
 from __future__ import annotations
 
+import annotationlib
 from collections import deque
 from collections.abc import Callable, Iterable, Iterator, Mapping
 from dataclasses import dataclass
@@ -23,7 +24,7 @@ import inspect
 import re
 import traceback
 from types import FunctionType, ModuleType
-from typing import Any, ForwardRef, Optional
+from typing import Any
 from sphinx.application import Sphinx
 from sphinx.util import logging
 
@@ -66,7 +67,7 @@ class ParsedType:
         if isinstance(args, str) and not args:
             raise ValueError("Literal type must include at least one value.")
 
-    def crossref(self, globalns: Optional[Mapping[str, Any]] = None) -> str:
+    def crossref(self, globalns: Mapping[str, Any] | None = None) -> str:
         """Generates Sphinx cross-reference link for the given type, using local names."""
         if globalns is None:
             globalns = {}
@@ -329,20 +330,16 @@ def _sigdoc(fun: FunctionType, lines: list[str]) -> None:
     lines.append("")
     # FIXME: if an :rtype: line already exists, remove it here and re-append it after all param type lines.
     globalns = fun.__globals__
-    sig = inspect.signature(fun)
+    sig = inspect.signature(fun, annotation_format=annotationlib.Format.STRING)
     for p in sig.parameters.values():
         annotation = p.annotation
         if annotation == p.empty:
             continue
         if not isinstance(annotation, str):
-            if isinstance(annotation, ForwardRef):
-                annotation = annotation.__forward_arg__
-            else:
-                logger.warning(
-                    f"Found non-string annotation: {repr(annotation)}."
-                    " Did you forget to import annotations from __future__?"
-                )
-                annotation = str(annotation)
+            # STRING-format signatures yield string annotations; coerce anything
+            # unexpected rather than failing.
+            logger.warning(f"Found non-string annotation: {annotation!r}.")
+            annotation = str(annotation)
         try:
             t = parse_type(annotation)
             tx = t.crossref(globalns)
@@ -446,21 +443,21 @@ def attr_doc_handler(
         classname = ".".join(fullname.split(".")[:-1])
         parent_class = _class_dict.get(classname)
         if parent_class is not None:
-            annotations = parent_class.__annotations__
+            annotations = annotationlib.get_annotations(
+                parent_class, format=annotationlib.Format.STRING
+            )
             if attrname in annotations:
                 type_annotation = annotations[attrname]
             else:
                 type_annotation = None
             if type_annotation is not None:
                 if not isinstance(type_annotation, str):
-                    if isinstance(type_annotation, ForwardRef):
-                        type_annotation = type_annotation.__forward_arg__
-                    else:
-                        logger.warning(
-                            f"Found non-string annotation: {repr(type_annotation)}."
-                            " Did you forget to import annotations from __future__?"
-                        )
-                        type_annotation = str(type_annotation)
+                    # STRING-format annotations are strings; coerce anything
+                    # unexpected rather than failing.
+                    logger.warning(
+                        f"Found non-string annotation: {type_annotation!r}."
+                    )
+                    type_annotation = str(type_annotation)
                 t = parse_type(type_annotation)
                 tx = t.crossref()
                 if ":rtype:" not in "\n".join("lines"):
@@ -579,11 +576,11 @@ def _get_module_by_name(modname: str) -> ModuleType:
 
 def _get_obj_mod(
     app: Sphinx, what: str, fullname: str, obj: Any
-) -> Optional[ModuleType]:
+) -> ModuleType | None:
     """Gathers the containing module for the given ``obj``."""
     autodoc_type_aliases = app.config.__dict__.get("autodoc_type_aliases")
     name = fullname.split(".")[-1]
-    obj_mod: Optional[ModuleType]
+    obj_mod: ModuleType | None
     if autodoc_type_aliases is not None:
         if name in autodoc_type_aliases and fullname == autodoc_type_aliases[name]:
             modname = ".".join(fullname.split(".")[:-1])
@@ -612,7 +609,7 @@ def _get_obj_mod(
 def _build_fullname_dict(
     app: Sphinx,
     fullname: str,
-    obj_mod: Optional[ModuleType],
+    obj_mod: ModuleType | None,
 ) -> dict[str, str]:
     """
     Builds a dictionary of substitutions from module global names to their fully qualified names,
