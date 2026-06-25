@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 
 # In conf.py, can use property_descriptors and/or cached_property_descriptors
 # to specify descriptor classes which should be documented as (cached) properties.
-# For example, the following is in config.py for the tensorsat project:
+# For example, the following is in conf.py for the tensorsat project:
 # cached_property_descriptors = {"tensorsat._utils.meta.cached_property"}
 
 PROPERTY_DESCRIPTORS: set[str] = set()
@@ -231,7 +231,7 @@ def _parse_type_args(
         if arg.name == "...":
             if i < len(arg_ranges) - 1:
                 raise ValueError(
-                    "Ellipsis found in args, but not in last position,  at "
+                    "Ellipsis found in args, but not in last position, at "
                     f"{start = }, {stop = }, {annotation[start:stop] = }, {annotation = }"
                 )
             variadic = True
@@ -340,7 +340,7 @@ def _sigdoc(fun: FunctionType, lines: list[str]) -> None:
             else:
                 logger.warning(
                     f"Found non-string annotation: {repr(annotation)}."
-                    " Did you forget to import annotation from __future__?."
+                    " Did you forget to import annotations from __future__?"
                 )
                 annotation = str(annotation)
         try:
@@ -458,7 +458,7 @@ def attr_doc_handler(
                     else:
                         logger.warning(
                             f"Found non-string annotation: {repr(type_annotation)}."
-                            " Did you forget to import annotation from __future__?."
+                            " Did you forget to import annotations from __future__?"
                         )
                         type_annotation = str(type_annotation)
                 t = parse_type(type_annotation)

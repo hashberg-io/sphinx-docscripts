@@ -10,35 +10,37 @@ Additionally, the [`docs/intersphinx`](./docs/intersphinx/) folder contains obje
 
 ## Project Information
 
-In [`docs/conf.py`](./docs/conf.py):
+When adding these scripts to a project, replace the following placeholders
+throughout the [`docs`](./docs/) folder (a project-wide find-and-replace is the
+quickest way):
 
-- Set `project` to the project name (e.g. `example-project`).
-- Update `copyright` and `author` if required (e.g. in collabs).
-- Set `release` and `version` to the desired version numbers.
+| Placeholder | Replace with | Example |
+| --- | --- | --- |
+| `PROJECT_NAME` | Project/distribution name, as published on PyPI. | `example-project` |
+| `PACKAGE_NAME` | Top-level importable package name. | `example_project` |
+| `COPYRIGHT_HOLDER` | Copyright holder shown in the docs footer. | `2025, Example Org` |
+| `AUTHOR_NAME` | Author name shown in the docs metadata. | `Example Org` |
 
-In [`docs/make-api.json`](./docs/make-api.json):
+The placeholders appear in the following files:
 
-- Set `pkg_name` to the package name (e.g. `"example_project"`).
+- [`docs/conf.py`](./docs/conf.py): `project` (`PROJECT_NAME`), `copyright`
+  (`COPYRIGHT_HOLDER`) and `author` (`AUTHOR_NAME`). Also set `release` and
+  `version` to the desired version numbers.
+- [`docs/make-api.json`](./docs/make-api.json): `pkg_name` (`PACKAGE_NAME`).
+- [`docs/api-toc.rst`](./docs/api-toc.rst): the `api/PACKAGE_NAME` entry. Add any
+  other module names here (e.g. `api/PACKAGE_NAME.SCRIPT_MODULE_NAME` for a
+  script package).
+- [`docs/index.rst`](./docs/index.rst): the title and GitHub repository link
+  (`PROJECT_NAME`). Write a brief description of the project (e.g. the
+  description at the start of the GitHub README file).
+- [`docs/getting-started.rst`](./docs/getting-started.rst): the PyPI release
+  link, the `pip install` instructions and the GitHub repository link
+  (`PROJECT_NAME`). Write an introductory description of the project, with basic
+  usage instructions/examples.
 
-In [`docs/index.rst`](./docs/index.rst):
-
-- Set the title to the project name.
-- Set the correct GitHub repository link.
-- Write a brief description of the project (e.g. the description at the start of the GitHub README file).
-
-In [`docs/api-toc.rst`](./docs/api-toc.rst):
-
-- Set the package name in the `api` folder.
-- Add any other module names (e.g. `api/PACKAGE_NAME.SCRIPT_MODULE_NAME` for a script package).
-
-In [`docs/getting-started.rst`](./docs/getting-started.rst):
-
-- Set the correct PyPI release link.
-- Set the correct project name in the `pip install` instructions.
-- Set the correct GitHub repository link.
-- Write an introductory description of the project, with basic usage instructions/examples.
-
-In [`docs/requirements.txt`](./docs/requirements.txt), add package dependencies.
+In [`docs/requirements.txt`](./docs/requirements.txt), replace `PROJECT_NAME`
+with the project itself and add any further package dependencies needed to
+import it while building the documentation.
 
 
 ## Usage
@@ -62,13 +64,13 @@ Missing references can be skipped by adding the full name to the `skip_missing_r
 The following keys can be set in [`docs/make-api.json`](./docs/make-api.json):
 
 ```python
-    "type_aliases": Dict[str, List[str]],
-    "include_members": Dict[str, List[str]],
-    "exclude_members": Dict[str, List[str]],
-    "include_modules": List[str],
-    "exclude_modules": List[str],
-    "member_fullnames": Dict[str, Dict[str, str]],
-    "special_class_members": Dict[str, List[str]],
+    "type_aliases": dict[str, list[str]],
+    "include_members": dict[str, list[str]],
+    "exclude_members": dict[str, list[str]],
+    "include_modules": list[str],
+    "exclude_modules": list[str],
+    "member_fullnames": dict[str, dict[str, str]],
+    "special_class_members": dict[str, list[str]],
 ```
 
 ### Type Aliases
