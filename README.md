@@ -45,6 +45,8 @@ import it while building the documentation.
 
 ## Usage
 
+Building the documentation requires **Python 3.14 or later**: the `autodoc_typehints.py` plugin reads string-form type annotations through the [`annotationlib`](https://docs.python.org/3/library/annotationlib.html) module, so that it works whether a project uses `from __future__ import annotations` or the lazy annotations that are the default from Python 3.14 onwards. The documented project itself may target any Python version it likes.
+
 To make the documentation, run the following commands from the [`docs`](./docs) folder:
 
 ```
