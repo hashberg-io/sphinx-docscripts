@@ -332,6 +332,7 @@ def make_apidocs() -> None:
             include_members[mod_name] = []
         include_members[mod_name].extend(type_alias_members)
 
+    os.makedirs(apidocs_folder, exist_ok=True)
     print(f"Removing all docfiles from {apidocs_folder}/")
     for apidoc_file in glob.glob(f"{apidocs_folder}/*.rst"):
         print(f"    {apidoc_file}")
