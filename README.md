@@ -75,8 +75,10 @@ The following keys can be set in [`docs/make-api.json`](./docs/make-api.json):
 
 ### Type Aliases
 
-The `type_aliases` key can be set to a dictionary, where an entry maps a module name to a list of module-level type alias names which should be explicitly included in the documentation, because Autodoc doesn't otherwise recognise them.
-This setting impacts documentation more broadly, making the type aliases listed available to docstrings for other modules.
+Type aliases declared with the PEP 695 `type` statement (e.g. `type Vec = list[float]`) are **detected automatically** and included in the documentation, attributed to the module that defines them. For these, no configuration is needed.
+
+The `type_aliases` key remains available for aliases that auto-detection cannot see — most commonly legacy aliases declared as `X: TypeAlias = ...` or as bare assignments. An entry maps a module name to a list of module-level type alias names to include. Entries listed here take precedence over auto-detected ones, so they also serve to pin the module a given alias name is attributed to when it is re-exported from several modules.
+Including a type alias (whether auto-detected or listed here) impacts documentation more broadly, making it available to docstrings for other modules.
 The following usage example is adapted from [`tensorsat`](https://github.com/hashberg-io/tensorsat):
 
 ```json

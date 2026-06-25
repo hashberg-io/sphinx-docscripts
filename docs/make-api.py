@@ -10,7 +10,8 @@ import os
 import pkgutil
 import sys
 from dataclasses import dataclass, field
-from typing import Any, Callable
+from types import ModuleType
+from typing import Any, Callable, TypeAliasType
 
 
 def _list_package_contents(pkg_name: str) -> list[str]:
@@ -249,6 +250,37 @@ class MakeApiConfig:
             return cls.from_dict(json.load(f))
 
 
+def _collect_type_aliases(
+    manual: dict[str, list[str]], modules_dict: dict[str, ModuleType]
+) -> dict[str, list[str]]:
+    """
+    Merges the manually configured type aliases with the PEP 695 ``type``
+    aliases auto-detected in the given modules.
+
+    A ``type X = ...`` statement creates a :class:`typing.TypeAliasType`, which
+    is detected here and attributed to the module that defines it. Manual
+    entries take precedence: they are listed first, so they win whenever the
+    same alias name is defined in more than one module. The manual config can
+    also supplement auto-detection with legacy aliases (e.g. ``X: TypeAlias =
+    ...`` or bare assignments) that are not ``TypeAliasType`` instances.
+    """
+    auto: dict[str, list[str]] = {}
+    for mod_name, mod in modules_dict.items():
+        for member_name, member in vars(mod).items():
+            if member_name.startswith("_"):
+                continue
+            if isinstance(member, TypeAliasType) and member.__module__ == mod_name:
+                auto.setdefault(mod_name, []).append(member_name)
+    merged: dict[str, list[str]] = {}
+    for mod_name in [*manual, *auto]:
+        if mod_name in merged:
+            continue
+        merged[mod_name] = list(
+            dict.fromkeys(manual.get(mod_name, []) + auto.get(mod_name, []))
+        )
+    return merged
+
+
 def make_apidocs() -> None:
     """
     A script to generate .rst files for API documentation.
@@ -270,17 +302,11 @@ def make_apidocs() -> None:
     type_alias_dict_filename = cfg.type_alias_dict_filename
     # Copied because the type-alias members are merged into it below.
     include_members = {key: list(value) for key, value in cfg.include_members.items()}
-    type_aliases = cfg.type_aliases
     exclude_members = cfg.exclude_members
     include_modules = cfg.include_modules
     exclude_modules = cfg.exclude_modules
     member_fullnames = cfg.member_fullnames
     special_class_members = cfg.special_class_members
-
-    for mod_name, type_alias_members in type_aliases.items():
-        if mod_name not in include_members:
-            include_members[mod_name] = []
-        include_members[mod_name].extend(type_alias_members)
 
     cwd = os.getcwd()
     os.chdir(pkg_path)
@@ -291,6 +317,12 @@ def make_apidocs() -> None:
         if mod_name not in modules_dict:
             modules_dict[mod_name] = importlib.import_module(mod_name)
     os.chdir(cwd)
+
+    type_aliases = _collect_type_aliases(cfg.type_aliases, modules_dict)
+    for mod_name, type_alias_members in type_aliases.items():
+        if mod_name not in include_members:
+            include_members[mod_name] = []
+        include_members[mod_name].extend(type_alias_members)
 
     print(f"Removing all docfiles from {apidocs_folder}/")
     for apidoc_file in glob.glob(f"{apidocs_folder}/*.rst"):
