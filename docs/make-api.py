@@ -1,5 +1,5 @@
 """
-    A script to generate .rst files for API documentation.
+A script to generate .rst files for API documentation.
 """
 
 import glob
@@ -11,10 +11,11 @@ import pkgutil
 from typing import Dict, List, Optional, Tuple
 import sys
 
+
 def _list_package_contents(pkg_name: str) -> List[str]:
     modules = [pkg_name]
     for submod in pkgutil.iter_modules([pkg_name.replace(".", "/")]):
-        submod_fullname = pkg_name+"."+submod.name
+        submod_fullname = pkg_name + "." + submod.name
         if submod.ispkg:
             for subsubmod_name in _list_package_contents(submod_fullname):
                 modules.append(subsubmod_name)
@@ -22,21 +23,84 @@ def _list_package_contents(pkg_name: str) -> List[str]:
             modules.append(submod_fullname)
     return modules
 
-SPECIAL_CLASS_MEMBERS_REL = ("__eq__", "__gt__", "__ge__", "__lt__", "__le__", "__ne__", )
-SPECIAL_CLASS_MEMBERS_UNOP = ("__abs__", "__not__", "__inv__", "__invert__", "__neg__", "__pos__", )
-SPECIAL_CLASS_MEMBERS_BINOP = ("__add__", "__and__", "__concat__", "__floordiv__", "__lshift__", "__mod__", "__mul__",
-                               "__matmul__", "__or__", "__pow__", "__rshift__", "__sub__", "__truediv__", "__xor__", )
-SPECIAL_CLASS_MEMBERS_BINOP_I = tuple(f"__i{name[2:]}" for name in SPECIAL_CLASS_MEMBERS_BINOP)
-SPECIAL_CLASS_MEMBERS_BINOP_R = tuple(f"__r{name[2:]}" for name in SPECIAL_CLASS_MEMBERS_BINOP)
-SPECIAL_CLASS_MEMBERS_CAST = ("__bool__", "__int__", "__float__", "__complex__", "__bytes__", "__str__")
-SPECIAL_CLASS_MEMBERS_OTHER = ("__init__", "__new__", "__call__", "__repr__", "__index__", "__contains__",
-                               "__delitem__", "__getitem__", "__setitem__", "__getattr__", "__setattr__", "__delattr__", "__set_name__", "__set__", "__get__")
-SPECIAL_CLASS_MEMBERS = (SPECIAL_CLASS_MEMBERS_REL+SPECIAL_CLASS_MEMBERS_UNOP+SPECIAL_CLASS_MEMBERS_BINOP+SPECIAL_CLASS_MEMBERS_BINOP_I
-                         +SPECIAL_CLASS_MEMBERS_BINOP_R+SPECIAL_CLASS_MEMBERS_CAST+SPECIAL_CLASS_MEMBERS_OTHER)
+
+SPECIAL_CLASS_MEMBERS_REL = (
+    "__eq__",
+    "__gt__",
+    "__ge__",
+    "__lt__",
+    "__le__",
+    "__ne__",
+)
+SPECIAL_CLASS_MEMBERS_UNOP = (
+    "__abs__",
+    "__not__",
+    "__inv__",
+    "__invert__",
+    "__neg__",
+    "__pos__",
+)
+SPECIAL_CLASS_MEMBERS_BINOP = (
+    "__add__",
+    "__and__",
+    "__concat__",
+    "__floordiv__",
+    "__lshift__",
+    "__mod__",
+    "__mul__",
+    "__matmul__",
+    "__or__",
+    "__pow__",
+    "__rshift__",
+    "__sub__",
+    "__truediv__",
+    "__xor__",
+)
+SPECIAL_CLASS_MEMBERS_BINOP_I = tuple(
+    f"__i{name[2:]}" for name in SPECIAL_CLASS_MEMBERS_BINOP
+)
+SPECIAL_CLASS_MEMBERS_BINOP_R = tuple(
+    f"__r{name[2:]}" for name in SPECIAL_CLASS_MEMBERS_BINOP
+)
+SPECIAL_CLASS_MEMBERS_CAST = (
+    "__bool__",
+    "__int__",
+    "__float__",
+    "__complex__",
+    "__bytes__",
+    "__str__",
+)
+SPECIAL_CLASS_MEMBERS_OTHER = (
+    "__init__",
+    "__new__",
+    "__call__",
+    "__repr__",
+    "__index__",
+    "__contains__",
+    "__delitem__",
+    "__getitem__",
+    "__setitem__",
+    "__getattr__",
+    "__setattr__",
+    "__delattr__",
+    "__set_name__",
+    "__set__",
+    "__get__",
+)
+SPECIAL_CLASS_MEMBERS = (
+    SPECIAL_CLASS_MEMBERS_REL
+    + SPECIAL_CLASS_MEMBERS_UNOP
+    + SPECIAL_CLASS_MEMBERS_BINOP
+    + SPECIAL_CLASS_MEMBERS_BINOP_I
+    + SPECIAL_CLASS_MEMBERS_BINOP_R
+    + SPECIAL_CLASS_MEMBERS_CAST
+    + SPECIAL_CLASS_MEMBERS_OTHER
+)
+
 
 def make_apidocs() -> None:
     """
-        A script to generate .rst files for API documentation.
+    A script to generate .rst files for API documentation.
     """
     err_msg = """Expected a 'make-api.json' file, with the following structure:
 {
@@ -97,12 +161,9 @@ Set "toc_filename" to null to avoid generating a table of contents file.
 
     cwd = os.getcwd()
     os.chdir(pkg_path)
-    sys.path = [os.getcwd()]+sys.path
+    sys.path = [os.getcwd()] + sys.path
     modules = _list_package_contents(pkg_name)
-    modules_dict = {
-        mod_name: importlib.import_module(mod_name)
-        for mod_name in modules
-    }
+    modules_dict = {mod_name: importlib.import_module(mod_name) for mod_name in modules}
     for mod_name in include_modules:
         if mod_name not in modules_dict:
             modules_dict[mod_name] = importlib.import_module(mod_name)
@@ -123,8 +184,12 @@ Set "toc_filename" to null to avoid generating a table of contents file.
         for member_name in mod_type_aliases:
             member_fullname = f"{mod_name}.{member_name}"
             if member_name in type_alias_fullnames:
-                print(f"    WARNING! Skipping type alias {member_name} -> {member_fullname}")
-                print(f"             Existing type alias {member_name} -> {type_alias_fullnames[member_name]}")
+                print(
+                    f"    WARNING! Skipping type alias {member_name} -> {member_fullname}"
+                )
+                print(
+                    f"             Existing type alias {member_name} -> {type_alias_fullnames[member_name]}"
+                )
             else:
                 type_alias_fullnames[member_name] = member_fullname
                 print(f"    {member_name} -> {member_fullname}")
@@ -137,16 +202,20 @@ Set "toc_filename" to null to avoid generating a table of contents file.
         print(f"Writing API docfile {filename}")
         lines: List[str] = [
             mod_name,
-            "="*len(mod_name),
+            "=" * len(mod_name),
             "",
             f".. automodule:: {mod_name}",
-            ""
+            "",
         ]
         mod__all__ = getattr(mod, "__all__", [])
         reexported_members: List[Tuple[str, str]] = []
         for member_name in sorted(name for name in dir(mod)):
-            to_include = mod_name in include_members and member_name in include_members[mod_name]
-            to_exclude = mod_name in exclude_members and member_name in exclude_members[mod_name]
+            to_include = (
+                mod_name in include_members and member_name in include_members[mod_name]
+            )
+            to_exclude = (
+                mod_name in exclude_members and member_name in exclude_members[mod_name]
+            )
             if to_exclude:
                 continue
             member = getattr(mod, member_name)
@@ -154,13 +223,18 @@ Set "toc_filename" to null to avoid generating a table of contents file.
                 continue
             member = getattr(mod, member_name)
             member_module = inspect.getmodule(member)
-            member_module_name = member_module.__name__ if member_module is not None else None
+            member_module_name = (
+                member_module.__name__ if member_module is not None else None
+            )
             imported_member = member_module is not None and member_module != mod
             if mod_name in include_members and member_name in include_members[mod_name]:
                 imported_member = False
             if member_name in type_alias_fullnames:
                 member_fullname = type_alias_fullnames[member_name]
-            elif mod_name in member_fullnames and member_name in member_fullnames[mod_name]:
+            elif (
+                mod_name in member_fullnames
+                and member_name in member_fullnames[mod_name]
+            ):
                 member_fullname = member_fullnames[mod_name][member_name]
             elif imported_member:
                 if inspect.ismodule(member):
@@ -179,13 +253,13 @@ Set "toc_filename" to null to avoid generating a table of contents file.
             if not imported_member:
                 member_lines: List[str] = []
                 member_name_ = (
-                    member_name[:-1]+"\\_"
+                    member_name[:-1] + "\\_"
                     if member_name.endswith("_")
                     else member_name
                 )
                 member_lines = [
                     member_name_,
-                    "-"*len(member_name_),
+                    "-" * len(member_name_),
                     "",
                     f".. auto{member_kind}:: {member_fullname}",
                 ]
@@ -193,23 +267,35 @@ Set "toc_filename" to null to avoid generating a table of contents file.
                     member_lines.append("    :show-inheritance:")
                     member_lines.append("    :members:")
                     _special_class_submembers: list[str] = []
-                    if member_fullname in special_class_members and special_class_members[member_fullname]:
-                        _special_class_submembers.extend(special_class_members[member_fullname])
+                    if (
+                        member_fullname in special_class_members
+                        and special_class_members[member_fullname]
+                    ):
+                        _special_class_submembers.extend(
+                            special_class_members[member_fullname]
+                        )
                     for submember_name in SPECIAL_CLASS_MEMBERS:
                         if not hasattr(member, submember_name):
                             continue
                         submember = getattr(member, submember_name)
-                        if not hasattr(submember, "__doc__") or submember.__doc__ is None:
+                        if (
+                            not hasattr(submember, "__doc__")
+                            or submember.__doc__ is None
+                        ):
                             continue
                         if not ":meta public:" in submember.__doc__:
                             continue
                         if submember_name not in _special_class_submembers:
                             _special_class_submembers.append(submember_name)
                     if _special_class_submembers:
-                        member_lines.append(f"    :special-members: {', '.join(_special_class_submembers)}")
+                        member_lines.append(
+                            f"    :special-members: {', '.join(_special_class_submembers)}"
+                        )
                 member_lines.append("")
                 if member_name in type_alias_fullnames:
-                    print(f"    {member_kind} {member_name} -> {type_alias_fullnames[member_name]} (type alias)")
+                    print(
+                        f"    {member_kind} {member_name} -> {type_alias_fullnames[member_name]} (type alias)"
+                    )
                 else:
                     print(f"    {member_kind} {member_name}")
                 lines.extend(member_lines)
@@ -218,18 +304,20 @@ Set "toc_filename" to null to avoid generating a table of contents file.
         if reexported_members:
             reexported_members_header = f"{mod_name}.__all__"
             print(f"    {reexported_members_header}:")
-            lines.extend([
-                reexported_members_header,
-                "-"*len(reexported_members_header),
-                "",
-                "The following members were explicitly reexported using ``__all__``:",
-                "",
-            ])
+            lines.extend(
+                [
+                    reexported_members_header,
+                    "-" * len(reexported_members_header),
+                    "",
+                    "The following members were explicitly reexported using ``__all__``:",
+                    "",
+                ]
+            )
             refkinds = {
                 "data": "obj",
                 "function": "func",
                 "class": "class",
-                "module": "mod"
+                "module": "mod",
             }
             for member_fullname, member_kind in reexported_members:
                 refkind = f":py:{refkinds[member_kind]}:"
@@ -244,7 +332,7 @@ Set "toc_filename" to null to avoid generating a table of contents file.
         ".. toctree::",
         "    :maxdepth: 2",
         "    :caption: API Documentation",
-        ""
+        "",
     ]
     print(f"Writing TOC for API docfiles at {toc_filename}")
     for mod_name in modules_dict:
@@ -266,6 +354,7 @@ Set "toc_filename" to null to avoid generating a table of contents file.
         print()
         with open(type_alias_dict_filename, "w") as f:
             json.dump(type_alias_fullnames, f, indent=4)
+
 
 if __name__ == "__main__":
     make_apidocs()
