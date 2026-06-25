@@ -460,7 +460,7 @@ def attr_doc_handler(
                     type_annotation = str(type_annotation)
                 t = parse_type(type_annotation)
                 tx = t.crossref()
-                if ":rtype:" not in "\n".join("lines"):
+                if ":rtype:" not in "\n".join(lines):
                     lines.append(f":rtype: {tx}")
     except Exception as e:
         tb_str = "\n".join(traceback.format_tb(e.__traceback__))
