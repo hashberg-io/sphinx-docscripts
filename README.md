@@ -71,6 +71,7 @@ The following keys can be set in [`docs/make-api.json`](./docs/make-api.json):
     "exclude_modules": list[str],
     "member_fullnames": dict[str, dict[str, str]],
     "special_class_members": dict[str, list[str]],
+    "manual_doc": dict[str, list[str]],
 ```
 
 ### Type Aliases
@@ -291,4 +292,22 @@ __delattr__
 __set_name__
 __set__
 __get__
+```
+
+### Manual Documentation
+
+The `manual_doc` key can be set to a dictionary, where an entry maps a member's full name to a list of reStructuredText lines to insert immediately before that member's autodoc directive.
+This is useful for members that Autodoc cannot describe on its own, most commonly union type aliases.
+The following usage example is adapted from [`tensorsat`](https://github.com/hashberg-io/tensorsat):
+
+```json
+"manual_doc": {
+    "tensorsat.diagrams.Block": [
+        "Type alias for a block in a diagram, which can be either:",
+        "",
+        "- a box, as an instance of a subclass of :class:`Box`;",
+        "- a sub-diagram, as an instance of :class:`Diagram`.",
+        ""
+    ]
+}
 ```

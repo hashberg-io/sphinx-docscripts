@@ -114,6 +114,7 @@ STRUCTURE_HELP = """Expected a 'make-api.json' file, with the following structur
     "exclude_modules": list[str],
     "member_fullnames": dict[str, dict[str, str]],
     "special_class_members": dict[str, list[str]],
+    "manual_doc": dict[str, list[str]],
 }
 
 The keys "pkg_name", "pkg_path" and "apidocs_folder" are required; every other
@@ -188,6 +189,11 @@ _SCHEMA: dict[str, tuple[bool, Callable[[Any], bool], str]] = {
         _is_str_to_str_list,
         "a mapping of strings to lists of strings",
     ),
+    "manual_doc": (
+        False,
+        _is_str_to_str_list,
+        "a mapping of strings to lists of strings",
+    ),
 }
 
 
@@ -207,6 +213,7 @@ class MakeApiConfig:
     exclude_modules: list[str] = field(default_factory=list)
     member_fullnames: dict[str, dict[str, str]] = field(default_factory=dict)
     special_class_members: dict[str, list[str]] = field(default_factory=dict)
+    manual_doc: dict[str, list[str]] = field(default_factory=dict)
 
     @classmethod
     def from_dict(cls, data: Any) -> "MakeApiConfig":
@@ -307,6 +314,7 @@ def make_apidocs() -> None:
     exclude_modules = cfg.exclude_modules
     member_fullnames = cfg.member_fullnames
     special_class_members = cfg.special_class_members
+    manual_doc = cfg.manual_doc
 
     cwd = os.getcwd()
     os.chdir(pkg_path)
@@ -406,18 +414,20 @@ def make_apidocs() -> None:
             elif inspect.ismodule(member):
                 member_kind = "module"
             if not imported_member:
-                member_lines: list[str] = []
                 member_name_ = (
                     member_name[:-1] + "\\_"
                     if member_name.endswith("_")
                     else member_name
                 )
-                member_lines = [
+                member_lines: list[str] = [
                     member_name_,
                     "-" * len(member_name_),
                     "",
-                    f".. auto{member_kind}:: {member_fullname}",
                 ]
+                # Optional manual documentation, inserted before the autodoc
+                # directive for members Autodoc cannot describe on its own.
+                member_lines.extend(manual_doc.get(member_fullname, []))
+                member_lines.append(f".. auto{member_kind}:: {member_fullname}")
                 if member_kind == "class":
                     member_lines.append("    :show-inheritance:")
                     member_lines.append("    :members:")
