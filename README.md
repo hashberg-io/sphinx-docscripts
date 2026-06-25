@@ -20,6 +20,7 @@ quickest way):
 | `PACKAGE_NAME` | Top-level importable package name. | `example_project` |
 | `COPYRIGHT_HOLDER` | Copyright holder shown in the docs footer. | `2025, Example Org` |
 | `AUTHOR_NAME` | Author name shown in the docs metadata. | `Example Org` |
+| `GITHUB_ORG` | GitHub organization or user that owns the repository. | `example-org` |
 
 The placeholders appear in the following files:
 
@@ -31,12 +32,12 @@ The placeholders appear in the following files:
   other module names here (e.g. `api/PACKAGE_NAME.SCRIPT_MODULE_NAME` for a
   script package).
 - [`docs/index.rst`](./docs/index.rst): the title and GitHub repository link
-  (`PROJECT_NAME`). Write a brief description of the project (e.g. the
-  description at the start of the GitHub README file).
+  (`PROJECT_NAME`, `GITHUB_ORG`). Write a brief description of the project (e.g.
+  the description at the start of the GitHub README file).
 - [`docs/getting-started.rst`](./docs/getting-started.rst): the PyPI release
   link, the `pip install` instructions and the GitHub repository link
-  (`PROJECT_NAME`). Write an introductory description of the project, with basic
-  usage instructions/examples.
+  (`PROJECT_NAME`, `GITHUB_ORG`). Write an introductory description of the
+  project, with basic usage instructions/examples.
 
 In [`docs/requirements.txt`](./docs/requirements.txt), replace `PROJECT_NAME`
 with the project itself and add any further package dependencies needed to

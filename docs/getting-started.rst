@@ -11,4 +11,4 @@ You can install the latest release from `PyPI <https://pypi.org/project/PROJECT_
 
 Some information about how to get started with the project.
 
-GitHub repo: https://github.com/hashberg-io/PROJECT_NAME
+GitHub repo: https://github.com/GITHUB_ORG/PROJECT_NAME

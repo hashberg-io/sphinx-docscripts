@@ -4,7 +4,7 @@ PROJECT_NAME
 
 A brief description of the project.
 
-GitHub repo: https://github.com/hashberg-io/PROJECT_NAME
+GitHub repo: https://github.com/GITHUB_ORG/PROJECT_NAME
 
 
 .. toctree::
