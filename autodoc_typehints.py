@@ -454,9 +454,7 @@ def attr_doc_handler(
                 if not isinstance(type_annotation, str):
                     # STRING-format annotations are strings; coerce anything
                     # unexpected rather than failing.
-                    logger.warning(
-                        f"Found non-string annotation: {type_annotation!r}."
-                    )
+                    logger.warning(f"Found non-string annotation: {type_annotation!r}.")
                     type_annotation = str(type_annotation)
                 t = parse_type(type_annotation)
                 tx = t.crossref()
@@ -574,9 +572,7 @@ def _get_module_by_name(modname: str) -> ModuleType:
     return mod
 
 
-def _get_obj_mod(
-    app: Sphinx, what: str, fullname: str, obj: Any
-) -> ModuleType | None:
+def _get_obj_mod(app: Sphinx, what: str, fullname: str, obj: Any) -> ModuleType | None:
     """Gathers the containing module for the given ``obj``."""
     autodoc_type_aliases = app.config.__dict__.get("autodoc_type_aliases")
     name = fullname.split(".")[-1]
